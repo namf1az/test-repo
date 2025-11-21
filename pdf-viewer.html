@@ -55,10 +55,10 @@
   <body>
     <main>
       <button id="openPdfBtn">Open PDF in Popup</button>
-      <p class="note">
-        Update <code>PDF_URL</code> in the script with any PDF you'd like to
-        preview.
-      </p>
+        <p class="note">
+          Update <code>PDF_URL</code> with any PDF you'd like to preview; the
+          popup hides built-in download controls where the browser allows.
+        </p>
     </main>
 
     <script>
@@ -122,9 +122,11 @@
       }
     </style>
   </head>
-  <body>
-    <iframe src="${encodeURI(pdfUrl)}#view=FitH" title="PDF preview"></iframe>
-  </body>
+    <body>
+      <iframe src="${encodeURI(
+        pdfUrl
+      )}#toolbar=0&navpanes=0&scrollbar=0&view=FitH" title="PDF preview"></iframe>
+    </body>
 </html>`);
 
         popup.document.close();
