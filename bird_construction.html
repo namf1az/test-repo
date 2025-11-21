@@ -18,6 +18,20 @@
       background: linear-gradient(180deg, #8dd0ff 0%, #c2e6ff 40%, #f2dfc6 100%);
     }
 
+    .banner-wrapper {
+      width: min(92vw, 900px);
+      margin: 0 auto 1.5rem;
+    }
+
+    #bannerCanvas {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 1rem;
+      background: linear-gradient(180deg, #dff2ff 0%, #fef4d9 100%);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.16);
+    }
+
     .scene {
       padding: 1.5rem;
       border-radius: 1.5rem;
@@ -78,6 +92,9 @@
   </style>
 </head>
 <body>
+  <div class="banner-wrapper">
+    <canvas id="bannerCanvas" width="900" height="160"></canvas>
+  </div>
   <div class="scene">
     <canvas id="siteCanvas" width="600" height="400"></canvas>
     <div class="hud">
@@ -87,10 +104,14 @@
   </div>
 
   <script>
+    const bannerCanvas = document.getElementById("bannerCanvas");
+    const bannerCtx = bannerCanvas.getContext("2d");
     const canvas = document.getElementById("siteCanvas");
     const ctx = canvas.getContext("2d");
     const statusLabel = document.getElementById("statusLabel");
     const toggleBtn = document.getElementById("toggleBtn");
+    const BANNER_BASE_WIDTH = bannerCanvas.width;
+    const BANNER_BASE_HEIGHT = bannerCanvas.height;
 
     const bird = {
       x: 260,
@@ -111,6 +132,24 @@
       swing: 0,
       speed: 0.01,
     };
+
+    const bannerBird = {
+      x: -220,
+      y: 80,
+      speed: 0.12,
+      wingPhase: 0,
+    };
+
+    const bannerState = {
+      swayPhase: 0,
+    };
+
+    const bannerClouds = [
+      { x: 120, y: 45, size: 32 },
+      { x: 300, y: 30, size: 26 },
+      { x: 520, y: 55, size: 30 },
+      { x: 720, y: 35, size: 28 },
+    ];
 
     let lastTimestamp = 0;
     let running = true;
@@ -134,6 +173,128 @@
       ctx.fillStyle = "#ccb9a0";
       ctx.fillRect(0, canvas.height - 90, canvas.width, 90);
       ctx.restore();
+    }
+
+    function drawCloud(x, y, size) {
+      bannerCtx.beginPath();
+      bannerCtx.arc(x, y, size, 0, Math.PI * 2);
+      bannerCtx.arc(x + size * 0.9, y + 4, size * 0.8, 0, Math.PI * 2);
+      bannerCtx.arc(x - size * 0.95, y + 6, size * 0.7, 0, Math.PI * 2);
+      bannerCtx.fill();
+    }
+
+    function drawBanner() {
+      if (!bannerCtx) return;
+      bannerCtx.clearRect(0, 0, BANNER_BASE_WIDTH, BANNER_BASE_HEIGHT);
+
+      const skyGradient = bannerCtx.createLinearGradient(0, 0, 0, BANNER_BASE_HEIGHT);
+      skyGradient.addColorStop(0, "#d7f0ff");
+      skyGradient.addColorStop(1, "#fff1ce");
+      bannerCtx.fillStyle = skyGradient;
+      bannerCtx.fillRect(0, 0, BANNER_BASE_WIDTH, BANNER_BASE_HEIGHT);
+
+      bannerCtx.fillStyle = "rgba(255, 255, 255, 0.92)";
+      bannerClouds.forEach((cloud, idx) => {
+        const drift = Math.sin(bannerState.swayPhase * 2 + idx) * 18;
+        drawCloud(cloud.x + drift, cloud.y + (idx % 2 ? 8 : 0), cloud.size);
+      });
+
+      const bob = Math.sin(bannerState.swayPhase * 3) * 3;
+      const birdX = bannerBird.x;
+      const birdY = bannerBird.y + bob;
+
+      // banner ropes
+      const bannerWidth = 260;
+      const bannerHeight = 60;
+      const bannerX = birdX - 230;
+      const bannerY = birdY + 6;
+      bannerCtx.strokeStyle = "#b07033";
+      bannerCtx.lineWidth = 3;
+      bannerCtx.beginPath();
+      bannerCtx.moveTo(birdX - 5, birdY + 12);
+      bannerCtx.lineTo(bannerX + 10, bannerY + 5);
+      bannerCtx.moveTo(birdX - 5, birdY + 20);
+      bannerCtx.lineTo(bannerX + 10, bannerY + bannerHeight - 5);
+      bannerCtx.stroke();
+
+      // banner sheet
+      bannerCtx.save();
+      const sway = Math.sin(bannerState.swayPhase) * 0.08;
+      bannerCtx.translate(bannerX + bannerWidth / 2, bannerY + bannerHeight / 2);
+      bannerCtx.rotate(sway);
+      bannerCtx.fillStyle = "#fff8e2";
+      bannerCtx.fillRect(-bannerWidth / 2, -bannerHeight / 2, bannerWidth, bannerHeight);
+      bannerCtx.strokeStyle = "#f4a835";
+      bannerCtx.lineWidth = 6;
+      bannerCtx.strokeRect(-bannerWidth / 2, -bannerHeight / 2, bannerWidth, bannerHeight);
+      bannerCtx.setLineDash([12, 10]);
+      bannerCtx.strokeStyle = "rgba(0, 0, 0, 0.06)";
+      bannerCtx.strokeRect(-bannerWidth / 2 + 6, -bannerHeight / 2 + 6, bannerWidth - 12, bannerHeight - 12);
+      bannerCtx.setLineDash([]);
+      bannerCtx.fillStyle = "#d96a07";
+      bannerCtx.font = "bold 24px 'Segoe UI', sans-serif";
+      bannerCtx.textAlign = "center";
+      bannerCtx.textBaseline = "middle";
+      bannerCtx.fillText("UNDER CONSTRUCTION", 0, 0);
+      bannerCtx.restore();
+
+      // wing
+      bannerCtx.save();
+      bannerCtx.translate(birdX - 10, birdY + 4);
+      bannerCtx.rotate(Math.sin(bannerBird.wingPhase) * 0.45);
+      bannerCtx.fillStyle = "#376da0";
+      bannerCtx.beginPath();
+      bannerCtx.ellipse(0, 0, 18, 12, 0, 0, Math.PI * 2);
+      bannerCtx.fill();
+      bannerCtx.restore();
+
+      // body
+      bannerCtx.fillStyle = "#4a8fbd";
+      bannerCtx.beginPath();
+      bannerCtx.ellipse(birdX, birdY, 34, 24, 0, 0, Math.PI * 2);
+      bannerCtx.fill();
+
+      // head
+      bannerCtx.beginPath();
+      bannerCtx.arc(birdX + 24, birdY - 16, 16, 0, Math.PI * 2);
+      bannerCtx.fill();
+
+      // hardhat
+      bannerCtx.fillStyle = "#ffcc33";
+      bannerCtx.beginPath();
+      bannerCtx.ellipse(birdX + 24, birdY - 20, 20, 10, 0, Math.PI, 0, true);
+      bannerCtx.fill();
+      bannerCtx.beginPath();
+      bannerCtx.arc(birdX + 24, birdY - 22, 14, Math.PI, 0);
+      bannerCtx.fill();
+      bannerCtx.fillRect(birdX + 6, birdY - 14, 36, 6);
+
+      // eye
+      bannerCtx.fillStyle = "#fff";
+      bannerCtx.beginPath();
+      bannerCtx.arc(birdX + 30, birdY - 16, 5, 0, Math.PI * 2);
+      bannerCtx.fill();
+      bannerCtx.fillStyle = "#1e1e1e";
+      bannerCtx.beginPath();
+      bannerCtx.arc(birdX + 31, birdY - 16, 2.5, 0, Math.PI * 2);
+      bannerCtx.fill();
+
+      // beak
+      bannerCtx.fillStyle = "#f5a623";
+      bannerCtx.beginPath();
+      bannerCtx.moveTo(birdX + 39, birdY - 13);
+      bannerCtx.lineTo(birdX + 55, birdY - 10);
+      bannerCtx.lineTo(birdX + 39, birdY - 6);
+      bannerCtx.closePath();
+      bannerCtx.fill();
+
+      // harness strap
+      bannerCtx.strokeStyle = "#ffcf5c";
+      bannerCtx.lineWidth = 4;
+      bannerCtx.beginPath();
+      bannerCtx.moveTo(birdX + 5, birdY - 10);
+      bannerCtx.lineTo(birdX - 15, birdY + 18);
+      bannerCtx.stroke();
     }
 
     function drawSiteEquipment() {
@@ -335,7 +496,18 @@
       ctx.restore();
     }
 
+    function updateBanner(delta) {
+      if (!bannerCtx) return;
+      bannerBird.x += bannerBird.speed * delta;
+      bannerBird.wingPhase += delta * 0.02;
+      bannerState.swayPhase += delta * 0.0015;
+      if (bannerBird.x > BANNER_BASE_WIDTH + 260) {
+        bannerBird.x = -260;
+      }
+    }
+
     function update(delta) {
+      updateBanner(delta);
       bird.bobPhase += delta * 0.003;
       hammer.angle += hammer.direction * hammer.speed * delta * 0.06;
 
@@ -351,6 +523,7 @@
     }
 
     function render() {
+      drawBanner();
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       drawBackground();
       drawSiteEquipment();
