@@ -1,0 +1,24 @@
+{
+  "name": "workspace",
+  "version": "1.0.0",
+  "description": "test-repo =========",
+  "private": true,
+  "main": "hello-openacr.js",
+  "scripts": {
+    "start": "node hello-openacr.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/namf1az/test-repo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/namf1az/test-repo/issues"
+  },
+  "homepage": "https://github.com/namf1az/test-repo#readme",
+  "dependencies": {
+    "@openacr/openacr": "github:GSA/openacr#main"
+  }
+}
