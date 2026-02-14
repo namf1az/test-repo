@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Currently Under Construction</title>
+    <style>
+      :root {
+        --surface: #0f172a;
+        --surface-glow: rgba(248, 250, 252, 0.07);
+        --accent: #facc15;
+        --accent-dark: #b45309;
+        --text: #fefce8;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle at top right, #1e293b, #0f172a 60%);
+        font-family: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont,
+          sans-serif;
+      }
+
+      .scene {
+        position: relative;
+        width: min(90vw, 640px);
+        aspect-ratio: 1 / 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.9));
+        border-radius: 2rem;
+        box-shadow: 0 25px 50px rgba(15, 23, 42, 0.55);
+        overflow: hidden;
+      }
+
+      .scene::before,
+      .scene::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: conic-gradient(
+          from 90deg,
+          rgba(250, 204, 21, 0.06),
+          transparent 35%,
+          rgba(249, 250, 251, 0.04),
+          transparent 70%
+        );
+        transform: rotate(15deg);
+      }
+
+      .scene::after {
+        transform: rotate(-25deg);
+        mix-blend-mode: screen;
+        opacity: 0.8;
+      }
+
+      .banner {
+        position: relative;
+        width: 120%;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.35rem;
+        font-weight: 700;
+        color: var(--text);
+        padding: 1.25rem 0;
+        transform: rotate(-18deg);
+        background: linear-gradient(
+          120deg,
+          var(--accent),
+          #fde68a 35%,
+          var(--accent),
+          var(--accent-dark)
+        );
+        box-shadow:
+          0 20px 40px rgba(15, 23, 42, 0.6),
+          inset 0 2px 4px rgba(255, 255, 255, 0.25);
+        border: 2px solid rgba(255, 255, 255, 0.4);
+      }
+
+      .banner::before,
+      .banner::after {
+        content: "";
+        position: absolute;
+        width: 35px;
+        height: 100%;
+        top: 0;
+        background: inherit;
+        border-top: inherit;
+        border-bottom: inherit;
+        filter: brightness(0.85);
+      }
+
+      .banner::before {
+        left: -35px;
+        clip-path: polygon(0 50%, 100% 0, 100% 100%);
+      }
+
+      .banner::after {
+        right: -35px;
+        clip-path: polygon(0 0, 100% 50%, 0 100%);
+      }
+
+      .banner span {
+        display: inline-block;
+        padding: 0 1rem;
+        text-shadow:
+          0 3px 5px rgba(15, 23, 42, 0.35),
+          0 0 15px rgba(250, 204, 21, 0.35);
+        font-size: clamp(1rem, 4.5vw, 2.5rem);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scene" role="img" aria-label="Currently under construction banner">
+      <div class="banner">
+        <span>Currently Under Construction</span>
+      </div>
+    </div>
+  </body>
+</html>
